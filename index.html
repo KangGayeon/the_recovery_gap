@@ -94,6 +94,18 @@ p,.prose,.cap,.log p,details .body{word-break:keep-all; text-wrap:pretty}
 .gcf-big span[data-i18n]{display:block; margin-top:10px; font-size:15px; color:#9A9A9A}
 .gcf-big .arrow{font-size:40px; color:#5A5A5A; padding-bottom:40px}
 .lg-appr{border:1.5px solid #fff}
+/* justice 3D */
+.j3-views{display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 10px}
+.j3{position:relative; width:100%; height:640px; display:none; touch-action:pan-y; margin-bottom:64px}
+.j3.on{display:block}
+.j3 canvas{display:block; width:100%!important; height:100%!important; cursor:grab}
+.j3 canvas:active{cursor:grabbing}
+.j3-labels{position:absolute; inset:0; pointer-events:none; z-index:2}
+.j3-labels span{position:absolute; transform:translate(-50%,-50%); white-space:nowrap; font-size:12px; color:#8A8A8A; transition:opacity .2s}
+.j3-labels span.c{color:#fff; font-size:13px; transform:translate(10px,-50%)}
+.j3-labels span.ax{color:#BDBDBD; font-size:13px}
+.j3-labels span.q{color:var(--silt); font-size:13px}
+@media (max-width:760px){ .j3{height:460px} }
 /* bar chart tooltip */
 .bar-tip{position:absolute; pointer-events:none; background:#fff; color:#000; font-size:14px; line-height:1.45; padding:9px 12px; border-radius:12px; opacity:0; transform:translateY(4px); transition:opacity .15s, transform .15s; white-space:nowrap; z-index:5; font-weight:400}
 .bar-tip.on{opacity:1; transform:none}
@@ -771,7 +783,7 @@ footer b{font-weight:400; color:#fff}
     <h3 data-i18n="jScH"></h3>
     <p class="cap" style="margin:-10px 0 14px" data-i18n="jScP"></p>
     <div class="legend2"><span><i class="lg-fin"></i><em data-i18n="jRec"></em></span><span><i class="lg-off"></i><em data-i18n="jNon"></em></span></div>
-    <div class="chart-box"><svg id="jusScatter" role="img"></svg></div>
+    <div class="chart-box" id="jus2d"><svg id="jusScatter" role="img"></svg></div>
     <p class="cap" data-i18n="jCap"></p>
   </div>
 </section>
@@ -831,6 +843,12 @@ const KO_NAMES = {"ABW":"아루바","AFG":"아프가니스탄","AGO":"앙골라"
 
 const T = {
 ko:{
+ jHint:"드래그하거나 커서를 움직여 회전",
+ jVTop:"배출 × 지원",
+ jVFront:"배출 × 재난",
+ jV3d:"입체",
+ jZ0:"지원 없음",
+ jZ:"1인당 연평균 적응금융 (달러, 로그 눈금)",
  gCap2:"출처: GCF Open Data API(2026년 10월 조회). 여러 나라에 걸친 사업의 집행액은 나라별 승인 비율로 배분. 최근 승인된 사업은 집행이 막 시작된 단계라 집행률이 낮게 나타나는 점에 유의",
  gCc:"적응·감축 혼합",
  gMi:"감축",
@@ -843,7 +861,7 @@ ko:{
  s13h:"승인된 돈의<br>3분의 1만 도착",
  s13step:"약속과 도착",
  rankGcf:"녹색기후기금 승인액 상위",
- lGcf:"녹색기후기금 승인액",
+ lGcf:"녹색기후기금 승인액 (2015–2026)",
  impQ:"남은 질문: 기후금융이 실제로 무엇을 바꾸었는지, 표시된 의도가 아니라 확인된 성과로 평가하려면 무엇이 필요한가",
  i5e:"근거: 분석의 뒷이야기",
  i5p:"중복 행 하나, 기록이 없는 해를 0으로 채운 선택 하나가 결론을 뒤집음. 약정이 아닌 집행 금액, 건수가 아닌 피해 규모, 재현 가능한 공개 코드가 기후금융 연구의 기본 조건",
@@ -956,13 +974,13 @@ ko:{
  s3step:"지도",
  s3h:"재난이 잦은 곳과 적응금융이 가는 곳",
  s3p:"재난 건수는 인구와 국토가 큰 나라에 몰리지만,<br>1인당 적응금융은 태평양 섬나라에 집중",
- lDis:"누적 기후재난 건수",
- lFin:"1인당 적응금융",
- lGr:"평균 GDP 성장률",
+ lDis:"누적 기후재난 건수 (1990–2024)",
+ lFin:"1인당 적응금융 (2000–2024)",
+ lGr:"평균 GDP 성장률 (1990–2024)",
  rankNote:"투발루처럼 지도에서 보이지 않을 만큼 작은 섬나라도 순위에 포함",
  rankDis:"재난이 가장 잦았던 나라",
  rankFin:"1인당 적응금융 상위",
- rankGr:"평균 성장률 상위",
+ rankGr:"평균 성장률 상위 (1990–2024)",
  s4step:"발견 3",
  s4h:"적응금융은 그 격차를 메우는가",
  s4p:"적응금융을 많이 받은 나라일수록 재난 뒤 반등이 커진다면 재난 1년 시차와 적응금융의 상호작용항이 양수여야 함. 변수 설계를 세 번 바꿔 검증",
@@ -1008,6 +1026,12 @@ ko:{
  fTools:"데이터 경제학 수업 프로젝트, 2026. Python, Google Colab, linearmodels, D3"
 },
 en:{
+ jHint:"Drag or move the cursor to rotate",
+ jVTop:"Emissions × support",
+ jVFront:"Emissions × disasters",
+ jV3d:"3D",
+ jZ0:"No support",
+ jZ:"Adaptation finance per person per year (USD, log scale)",
  gCap2:"Source: GCF Open Data API, accessed October 2026. Disbursements for multi-country projects are split by each country’s approved share. Recently approved projects have only begun disbursing, so their rates are naturally low.",
  gCc:"Cross-cutting",
  gMi:"Mitigation",
@@ -1020,7 +1044,7 @@ en:{
  s13h:"Only a third of approved<br>money has arrived",
  s13step:"Pledged versus arrived",
  rankGcf:"Top GCF approved funding",
- lGcf:"GCF approved funding",
+ lGcf:"GCF approved funding (2015–2026)",
  impQ:"The open question: what would it take to judge climate finance by what it actually changed, rather than by the intent written on its label?",
  i5e:"Evidence: Behind the analysis",
  i5p:"One set of duplicate rows, one decision to fill missing years with zeros, was enough to reverse conclusions. Disbursed rather than committed amounts, damage rather than counts, and reproducible public code should be the baseline for climate-finance research.",
@@ -1133,13 +1157,13 @@ en:{
  s3step:"Map",
  s3h:"Where disasters strike, and where adaptation finance goes",
  s3p:"Disaster counts pile up in large, populous countries,<br>while adaptation finance per person concentrates in Pacific island states.",
- lDis:"Total climate disasters",
- lFin:"Adaptation finance per person",
- lGr:"Average GDP growth",
+ lDis:"Total climate disasters (1990–2024)",
+ lFin:"Adaptation finance per person (2000–2024)",
+ lGr:"Average GDP growth (1990–2024)",
  rankNote:"Island states too small to see on the map, such as Tuvalu, are still included in the ranking.",
  rankDis:"Most disaster-hit countries",
  rankFin:"Highest adaptation finance per person",
- rankGr:"Highest average growth",
+ rankGr:"Highest average growth (1990–2024)",
  s4step:"Finding 3",
  s4h:"Does adaptation finance close the gap?",
  s4p:"If countries receiving more adaptation finance rebound more strongly after disasters, the interaction between lagged disasters and adaptation finance should be positive. I tested this with three variable designs.",
@@ -1457,10 +1481,21 @@ function drawJusScatter(animate){
   svg.append("text").attr("x", (m.l + W - m.r) / 2).attr("y", H - 14).attr("text-anchor", "middle").attr("fill", "#9A9A9A").attr("font-size", 14).text(t("jX"));
   svg.append("text").attr("transform", `translate(18,${(m.t + H - m.b) / 2}) rotate(-90)`).attr("text-anchor", "middle").attr("fill", "#9A9A9A").attr("font-size", 14).text(t("jY"));
   const data = J_PTS.slice().sort((a, b) => b[3] - a[3]);
-  const dots = svg.append("g").selectAll("circle").data(data).join("circle")
+  const defs = svg.append("defs");
+  const teal = d3.color(css("--growth"));
+  const sphere = (id, stops) => { const g = defs.append("radialGradient").attr("id", id).attr("cx", "36%").attr("cy", "30%").attr("r", "72%").attr("fx", "30%").attr("fy", "24%");
+    stops.forEach(([o, c, a]) => g.append("stop").attr("offset", o).attr("stop-color", c).attr("stop-opacity", a)); };
+  sphere("jsTeal", [["0%", "#FFFFFF", 0.95], ["18%", teal.brighter(0.9).formatHex(), 1], ["55%", teal.formatHex(), 1], ["100%", teal.darker(1.9).formatHex(), 1]]);
+  sphere("jsGray", [["0%", "#FFFFFF", 0.55], ["22%", "#9A9A9A", 0.35], ["70%", "#3A3A3A", 0.18], ["100%", "#1A1A1A", 0.5]]);
+  const glow = defs.append("filter").attr("id", "jsShadow").attr("x", "-50%").attr("y", "-50%").attr("width", "200%").attr("height", "200%");
+  glow.append("feDropShadow").attr("dx", 0).attr("dy", 2).attr("stdDeviation", 2.5).attr("flood-color", "#000").attr("flood-opacity", 0.7);
+  const dots = svg.append("g").attr("filter", "url(#jsShadow)").selectAll("circle").data(data).join("circle")
     .attr("cx", d => x(d[1])).attr("cy", d => y(d[2]))
-    .attr("fill", d => d[4] ? css("--growth") : "none").attr("fill-opacity", 0.55)
-    .attr("stroke", d => d[4] ? css("--growth") : "#6A6A6A").attr("stroke-width", 1.2)
+    .attr("fill", d => d[4] ? "url(#jsTeal)" : "url(#jsGray)").attr("fill-opacity", d => d[4] ? 0.92 : 1)
+    .attr("stroke", d => d[4] ? teal.darker(1).formatHex() : "#5A5A5A").attr("stroke-width", 0.6)
+    .style("transition", "r .2s")
+    .on("pointerenter.grow", function(ev, d){ d3.select(this).raise().attr("r", r(d[3]) * 1.3); })
+    .on("pointerleave.grow", function(ev, d){ d3.select(this).attr("r", r(d[3])); })
     .attr("r", d => animate && !reduce ? 0 : r(d[3]));
   if (animate && !reduce) dots.transition().delay(d => 200 + Math.random() * 700).duration(600).ease(d3.easeBackOut).attr("r", d => r(d[3]));
   const lab = ["USA", "CHN", "IND", "TUV", "MHL", "PHL", "QAT", "BGD", "DEU", "KOR"];
@@ -1478,24 +1513,76 @@ const GCF_YR = [[2015, 0.168, 0.131, 8], [2016, 1.264, 0.98, 27], [2017, 1.158, 
 const GCF_TH = [["Adaptation", 6.051, 2.229, 168], ["Mitigation", 6.572, 2.583, 84], ["Cross-cutting", 8.709, 2.546, 120]];
 const bnf = v => lang === "ko" ? "$" + d3.format(",.1f")(v * 10) + "억" : "$" + d3.format(",.2f")(v) + "bn";
 function drawGcfNums(){ document.querySelectorAll("[data-gcfnum]").forEach(el => { const v = +el.dataset.gcfnum; el.textContent = lang === "ko" ? v + "억" : (v / 10).toFixed(1) + "bn"; }); }
+let gcfTimer = null;
 function drawGcfYear(animate){
   const svg = d3.select("#gcfYear"); if (svg.empty()) return;
+  if (gcfTimer){ gcfTimer.stop(); gcfTimer = null; }
   const W = 1000, H = 340, m = {t:34, r:10, b:32, l:60};
   svg.attr("viewBox", `0 0 ${W} ${H}`); svg.selectAll("*").remove();
   const x = d3.scaleBand().domain(GCF_YR.map(d => d[0])).range([m.l, W - m.r]).padding(0.28);
   const y = d3.scaleLinear().domain([0, 3.5]).range([H - m.b, m.t]);
   svg.append("g").attr("class","axis").attr("transform",`translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W-m.l-m.r)).tickFormat(d => lang === "ko" ? "$" + d * 10 + "억" : "$" + d + "bn")).call(g=>g.select(".domain").remove());
   svg.append("g").attr("class","axis").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).tickSize(0).tickPadding(10)).call(g=>g.select(".domain").remove());
+  const defs = svg.append("defs");
+  const teal = d3.color(css("--growth"));
+  const lg = defs.append("linearGradient").attr("id", "gcfLiquid").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 1);
+  lg.append("stop").attr("offset", "0%").attr("stop-color", teal.brighter(0.6).formatHex());
+  lg.append("stop").attr("offset", "100%").attr("stop-color", teal.darker(0.6).formatHex());
   const g = svg.append("g");
-  const app = g.selectAll("rect.a").data(GCF_YR).join("rect").attr("class","a").attr("x", d => x(d[0])).attr("width", x.bandwidth())
-    .attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 1.5).attr("y", d => y(d[1])).attr("height", d => y(0) - y(d[1]));
-  const dis = g.selectAll("rect.d").data(GCF_YR).join("rect").attr("class","d").attr("x", d => x(d[0]) + 3).attr("width", x.bandwidth() - 6)
-    .attr("fill", css("--growth")).attr("y", d => animate && !reduce ? y(0) : y(d[2])).attr("height", d => animate && !reduce ? 0 : y(0) - y(d[2]));
-  if (animate && !reduce) dis.transition().delay((d, i) => 300 + i * 70).duration(700).ease(d3.easeCubicOut).attr("y", d => y(d[2])).attr("height", d => y(0) - y(d[2]));
-  g.selectAll("text.r").data(GCF_YR).join("text").attr("class","r").attr("x", d => x(d[0]) + x.bandwidth() / 2).attr("y", d => y(d[1]) - 8).attr("text-anchor","middle").attr("font-size", 13).attr("fill", "#9A9A9A")
-    .text(d => Math.round(d[2] / d[1] * 100) + "%");
+  // each approved bar is a glass; the disbursed amount fills it like water
+  GCF_YR.forEach((d, i) => defs.append("clipPath").attr("id", "gcfClip" + i).append("rect")
+    .attr("x", x(d[0]) + 1.5).attr("width", x.bandwidth() - 3).attr("y", y(d[1]) + 1.5).attr("height", y(0) - y(d[1]) - 1.5));
+  const liquids = g.selectAll("path.liq").data(GCF_YR).join("path").attr("class", "liq")
+    .attr("clip-path", (d, i) => `url(#gcfClip${i})`).attr("fill", "url(#gcfLiquid)");
+  const crest = g.selectAll("path.crest").data(GCF_YR).join("path").attr("class", "crest")
+    .attr("clip-path", (d, i) => `url(#gcfClip${i})`).attr("fill", "none").attr("stroke", "#fff").attr("stroke-opacity", 0.55).attr("stroke-width", 1.2);
+  g.selectAll("rect.a").data(GCF_YR).join("rect").attr("class","a").attr("x", d => x(d[0])).attr("width", x.bandwidth())
+    .attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 1.5).attr("y", d => y(d[1])).attr("height", d => y(0) - y(d[1])).style("pointer-events", "none");
+  const labels = g.selectAll("text.r").data(GCF_YR).join("text").attr("class","r").attr("x", d => x(d[0]) + x.bandwidth() / 2).attr("y", d => y(d[1]) - 8)
+    .attr("text-anchor","middle").attr("font-size", 13).attr("fill", "#9A9A9A");
+  const bw = x.bandwidth();
+  const surface = (d, level, phase, amp) => {
+    const x0 = x(d[0]), yl = y(level), pts = 14;
+    let p = `M${x0},${y(0)} L${x0},${yl}`;
+    for (let k = 0; k <= pts; k++){ const xx = x0 + bw * k / pts; p += ` L${xx.toFixed(1)},${(yl + Math.sin(phase + k / pts * Math.PI * 2) * amp).toFixed(2)}`; }
+    return p + ` L${x0 + bw},${y(0)} Z`;
+  };
+  const crestPath = (d, level, phase, amp) => {
+    const x0 = x(d[0]), yl = y(level), pts = 14; let p = "";
+    for (let k = 0; k <= pts; k++){ const xx = x0 + bw * k / pts; p += (k ? " L" : "M") + `${xx.toFixed(1)},${(yl + Math.sin(phase + k / pts * Math.PI * 2) * amp).toFixed(2)}`; }
+    return p;
+  };
+  const state = GCF_YR.map(() => 0);
+  const render = (elapsed, still) => {
+    GCF_YR.forEach((d, i) => {
+      const delay = 250 + i * 110, dur = 1700;
+      const p = still ? 1 : Math.min(1, Math.max(0, (elapsed - delay) / dur));
+      const e = 1 - Math.pow(1 - p, 3);
+      state[i] = d[2] * e;
+      const amp = still ? 0 : (p < 1 ? 4.5 * (0.4 + 0.6 * (1 - e)) : 1.6);
+      const phase = elapsed / 420 + i * 0.9;
+      const lv = Math.max(state[i], 0.0001);
+      const ampC = Math.min(amp, (y(0) - y(lv)) * 0.45);
+      d3.select(liquids.nodes()[i]).attr("d", surface(d, lv, phase, ampC));
+      d3.select(crest.nodes()[i]).attr("d", state[i] > 0.005 ? crestPath(d, lv, phase, ampC) : null);
+      d3.select(labels.nodes()[i]).text(Math.round(state[i] / d[1] * 100) + "%");
+    });
+  };
+  const start = () => {
+    gcfTimer = d3.timer(elapsed => {
+      if (route !== "map" || document.hidden){ gcfTimer.stop(); gcfTimer = null; render(0, true); return; }
+      render(elapsed, false);
+    });
+  };
+  if (animate && !reduce){
+    render(0, false);                                   // empty glasses until the chart scrolls into view
+    if (window.IntersectionObserver){
+      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ io.disconnect(); if (!gcfTimer) start(); } }, {threshold:0.35});
+      io.observe(svg.node());
+    } else start();
+  } else render(0, true);
   const hits = g.selectAll("rect.h").data(GCF_YR).join("rect").attr("class","h").attr("x", d => x(d[0]) - x.step() * x.paddingInner() / 2).attr("width", x.step()).attr("y", m.t).attr("height", H - m.t - m.b).attr("fill","transparent");
-  barTip(svg, dis, d => {
+  barTip(svg, liquids, d => {
     const ko = lang === "ko";
     return `<b>${d[0]}${ko ? "년 승인" : " approvals"}</b><br>${ko ? "승인" : "Approved"} ${bnf(d[1])}<br>${ko ? "집행" : "Disbursed"} ${bnf(d[2])}<br><span class="bt-sub">${ko ? "집행률" : "Rate"} ${(d[2] / d[1] * 100).toFixed(0)}% · ${d[3]}${ko ? "개 사업" : " projects"}</span>`;
   }, hits);
@@ -1521,6 +1608,151 @@ function drawGcfTheme(animate){
   }, hits);
   svg.attr("aria-label", GCF_TH.map(d => `${t(lab[d[0]])}: ${Math.round(d[2] / d[1] * 100)}%`).join("; "));
 }
+
+/* ---------- climate justice in 3D ---------- */
+let J3 = null, jView = "3d";
+const JV = {"3d":{yaw:-0.62, pitch:0.36}, front:{yaw:0, pitch:0}, top:{yaw:0, pitch:Math.PI/2 - 0.02}};
+const jx = v => (Math.log10(Math.max(v, 0.5)) - 1.74) * 2.3;          // emissions per person: 0.5–3000 t
+const jy = v => (Math.log10(Math.max(v, 0.05)) - 0.85) * 1.55;        // disasters per million: 0.05–1000
+const jz = v => v > 0 ? (Math.log10(Math.max(v, 0.01)) - 0.2) * 1.15 : -3.0; // adaptation $ per person
+function initJus3D(){
+  const host = document.getElementById("jus3d");
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  host.insertBefore(renderer.domElement, host.firstChild);
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(20, 1, 0.1, 300);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.7); sun.position.set(-4, 6, 8); scene.add(sun);
+  const root = new THREE.Group(); scene.add(root);
+  const X0 = jx(0.5), X1 = jx(3000), Y0 = jy(0.05), Y1 = jy(1000), Z0 = -3.3, Z1 = jz(300);
+  const line = (a, b, col, op) => { const g = new THREE.BufferGeometry().setFromPoints([a, b]); root.add(new THREE.Line(g, new THREE.LineBasicMaterial({color:col, transparent:true, opacity:op}))); };
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  [1, 10, 100, 1000].forEach(v => { const x = jx(v); line(V(x, Y0, Z0), V(x, Y1, Z0), 0xffffff, .10); line(V(x, Y0, Z0), V(x, Y0, Z1), 0xffffff, .10); });
+  [0.1, 1, 10, 100, 1000].forEach(v => { const y = jy(v); line(V(X0, y, Z0), V(X1, y, Z0), 0xffffff, .10); line(V(X0, y, Z0), V(X0, y, Z1), 0xffffff, .08); });
+  [0.1, 1, 10, 100].forEach(v => { const z = jz(v); line(V(X0, Y0, z), V(X1, Y0, z), 0xffffff, .08); line(V(X0, Y0, z), V(X0, Y1, z), 0xffffff, .06); });
+  line(V(X0, Y0, Z0), V(X1, Y0, Z0), 0xffffff, .5); line(V(X0, Y0, Z0), V(X0, Y1, Z0), 0xffffff, .5); line(V(X0, Y0, Z0), V(X0, Y0, Z1), 0xffffff, .5);
+  // "emitted little, hit often" zone on the back wall
+  const qx = jx(Math.sqrt(1500)), qy = jy(Math.sqrt(50));
+  const q = new THREE.Mesh(new THREE.PlaneGeometry(qx - X0, Y1 - qy), new THREE.MeshBasicMaterial({color:new THREE.Color(css("--silt")), transparent:true, opacity:0.07, depthWrite:false, side:THREE.DoubleSide}));
+  q.position.set((qx + X0) / 2, (Y1 + qy) / 2, Z0 + 0.001); root.add(q);
+  // "no support" floor strip
+  const nz = new THREE.Mesh(new THREE.PlaneGeometry(X1 - X0, 0.7), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.03, depthWrite:false, side:THREE.DoubleSide}));
+  nz.rotation.x = -Math.PI / 2; nz.position.set((X0 + X1) / 2, Y0 + 0.001, -3.0); root.add(nz);
+  const rs = d3.scaleSqrt().domain([0, 1.45e9]).range([0.035, 0.5]);
+  const teal = new THREE.Color(css("--growth"));
+  const geo = new THREE.SphereGeometry(1, 24, 16);
+  const balls = J_PTS.map((d, i) => {
+    const pc = CTRY[d[0]] ? CTRY[d[0]][3] || 0 : 0;
+    const mat = d[4] ? new THREE.MeshPhongMaterial({color:teal, emissive:teal.clone().multiplyScalar(0.25), transparent:true, opacity:0.78, shininess:40})
+                     : new THREE.MeshBasicMaterial({color:0x8A8A8A, wireframe:true, transparent:true, opacity:0.35});
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(jx(d[1]), jy(d[2]), jz(pc));
+    m.userData = {d, pc, r:rs(d[3]), delay: 200 + Math.random() * 900};
+    m.scale.setScalar(0.0001); root.add(m); return m;
+  });
+  J3 = {renderer, scene, camera, root, host, balls, yaw:JV["3d"].yaw, pitch:JV["3d"].pitch, yawT:JV["3d"].yaw, pitchT:JV["3d"].pitch,
+        drag:false, lx:0, ly:0, vel:0, mx:0, my:0, inside:false, ray:new THREE.Raycaster(), ptr:new THREE.Vector2(), running:false, t0:0,
+        dist:34, distT:23, hover:null, bounds:{X0, X1, Y0, Y1, Z0, Z1}};
+  const sizeIt = () => { const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); J3.w = w; J3.h = h; J3.distT = w < 760 ? 31 : 23; };
+  sizeIt(); window.addEventListener("resize", sizeIt); J3.sizeIt = sizeIt;
+  const el = renderer.domElement, fig = host.closest(".figure");
+  fig.style.position = "relative";
+  let tip = fig.querySelector(".bar-tip"); if (!tip){ tip = document.createElement("div"); tip.className = "bar-tip"; fig.appendChild(tip); }
+  el.addEventListener("pointerdown", e => { J3.drag = true; J3.lx = e.clientX; J3.ly = e.clientY; J3.vel = 0; el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", e => {
+    const b = el.getBoundingClientRect(); J3.mx = ((e.clientX - b.left) / b.width) * 2 - 1; J3.my = ((e.clientY - b.top) / b.height) * 2 - 1; J3.inside = true;
+    if (J3.drag){
+      const dx = e.clientX - J3.lx, dy = e.clientY - J3.ly; J3.lx = e.clientX; J3.ly = e.clientY;
+      J3.yawT += dx * 0.008; J3.vel = dx * 0.008; J3.pitchT = Math.max(-0.2, Math.min(Math.PI / 2 - 0.02, J3.pitchT + dy * 0.006));
+      setJView(null); tip.classList.remove("on"); return;
+    }
+    J3.ptr.set(J3.mx, -J3.my); J3.ray.setFromCamera(J3.ptr, camera);
+    const hit = J3.ray.intersectObjects(balls, false)[0];
+    if (J3.hover && (!hit || hit.object !== J3.hover)){ J3.hover.userData.hl = false; J3.hover = null; }
+    if (hit){
+      const m = hit.object, d = m.userData.d, ko = lang === "ko"; m.userData.hl = true; J3.hover = m;
+      tip.innerHTML = `<b>${nameOf(d[0])}</b><br>${ko ? "1인당 누적 CO₂" : "Cumulative CO₂ per person"} ${d3.format(",")(d[1])}${ko ? "톤" : " t"}<br>${ko ? "세계 누적 배출 비중" : "Share of world cumulative"} ${d[5] < 0.01 ? "<0.01" : d[5].toFixed(2)}%<br>${ko ? "기후재난" : "Climate disasters"} ${d[6]}${ko ? "건" : ""} · ${ko ? "100만 명당" : "per million"} ${d[2]}<br>${ko ? "1인당 적응금융" : "Adaptation finance per person"} ${m.userData.pc > 0 ? "$" + d3.format(",.2f")(m.userData.pc) : (ko ? "없음" : "none")}`;
+      tip.classList.add("on");
+      const fb = fig.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+      tip.style.left = Math.max(0, Math.min(e.clientX - fb.left + 16, fb.width - tw)) + "px"; tip.style.top = Math.max(0, e.clientY - fb.top - th - 14) + "px";
+      el.style.cursor = "pointer";
+    } else { tip.classList.remove("on"); el.style.cursor = ""; }
+  });
+  const end = () => { J3.drag = false; };
+  el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+  el.addEventListener("pointerleave", () => { J3.inside = false; J3.mx = J3.my = 0; tip.classList.remove("on"); if (J3.hover){ J3.hover.userData.hl = false; J3.hover = null; } });
+  buildJus3DLabels();
+}
+function buildJus3DLabels(){
+  if (!J3) return;
+  const box = document.getElementById("jus3dLabels"); box.innerHTML = ""; J3.labels = [];
+  const {X0, X1, Y0, Y1, Z0, Z1} = J3.bounds, V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const add = (cls, html, pos, view) => { const s = document.createElement("span"); s.className = cls; s.innerHTML = html; box.appendChild(s); J3.labels.push({el:s, pos, view}); };
+  const fmt = v => v >= 1 ? d3.format(",")(v) : String(v);
+  [1, 10, 100, 1000].forEach(v => add("", fmt(v), V(jx(v), Y0 - 0.35, Z1 + 0.2)));
+  [0.1, 1, 10, 100, 1000].forEach(v => add("", fmt(v), V(X0 - 0.45, jy(v), Z0), "ny"));
+  [0.1, 1, 10, 100].forEach(v => add("", "$" + fmt(v), V(X1 + 0.5, Y0, jz(v)), "nz"));
+  add("", t("jZ0"), V(X1 + 0.6, Y0, -3.0), "nz");
+  add("ax", t("jX"), V((X0 + X1) / 2, Y0 - 0.95, Z1 + 0.4));
+  add("ax", t("jY").replace(/ \(.*$/, ""), V(X0 - 0.4, Y1 + 0.45, Z0), "ny");
+  add("ax", t("jZ").replace(/ \(.*$/, ""), V(X1 + 0.6, Y0 - 0.55, (Z0 + Z1) / 2), "nz");
+  add("q", lang === "ko" ? "적게 배출, 자주 맞음" : "Emitted little, hit often", V(X0 + 1.4, Y1 - 0.25, Z0));
+  const lab = ["USA", "CHN", "IND", "TUV", "MHL", "PHL", "QAT", "BGD", "DEU", "KOR", "NRU"];
+  J3.balls.filter(m => lab.includes(m.userData.d[0])).forEach(m => add("c", nameOf(m.userData.d[0]), m.position.clone().add(V(m.userData.r, 0, 0)), "ball"));
+  J3.host.setAttribute("role", "img");
+  J3.host.setAttribute("aria-label", t("jScH") + ". " + t("jScP"));
+}
+function setJView(v){
+  jView = v;
+  document.querySelectorAll("[data-jview]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.jview === v)));
+  if (v && J3){ J3.yawT = JV[v].yaw; J3.pitchT = JV[v].pitch; J3.vel = 0; }
+}
+function jus3DFrame(now){
+  if (!J3 || !J3.running) return;
+  const k = now - J3.t0;
+  if (!J3.drag){
+    J3.yawT += J3.vel; J3.vel *= 0.92;
+    const free = jView === "3d" || jView === null;
+    const follow = J3.inside && !reduce && free ? J3.mx * 0.25 : 0;
+    const sway = !reduce && free ? Math.sin(now / 3000) * 0.06 : 0;
+    J3.yaw += ((J3.yawT + follow + sway) - J3.yaw) * 0.06;
+    J3.pitch += ((J3.pitchT + (J3.inside && !reduce && free ? J3.my * 0.1 : 0)) - J3.pitch) * 0.06;
+  } else { J3.yaw += (J3.yawT - J3.yaw) * 0.3; J3.pitch += (J3.pitchT - J3.pitch) * 0.3; }
+  J3.dist += (J3.distT - J3.dist) * (reduce ? 1 : 0.05);
+  const c = J3.camera, {X0, X1, Y0, Y1, Z0, Z1} = J3.bounds, target = new THREE.Vector3((X0 + X1) / 2, (Y0 + Y1) / 2, (Z0 + Z1) / 2);
+  c.position.set(target.x + Math.sin(J3.yaw) * Math.cos(J3.pitch) * J3.dist, target.y + Math.sin(J3.pitch) * J3.dist, target.z + Math.cos(J3.yaw) * Math.cos(J3.pitch) * J3.dist);
+  c.up.set(0, 1, 0); if (J3.pitch > 1.45) c.up.set(0, 0, -1);
+  c.lookAt(target);
+  J3.balls.forEach(m => {
+    const u = m.userData, p = reduce ? 1 : Math.min(1, Math.max(0, (k - u.delay) / 700)), e = p < 1 ? 1 - Math.pow(1 - p, 3) : 1;
+    m.scale.setScalar(Math.max(0.0001, u.r * e * (u.hl ? 1.35 : 1)));
+    if (m.material.emissive) m.material.emissive.copy(m.material.color).multiplyScalar(u.hl ? 0.7 : 0.25);
+  });
+  J3.renderer.render(J3.scene, c);
+  const v = new THREE.Vector3(), side = Math.abs(Math.sin(J3.yaw)), top = J3.pitch > 1.2;
+  J3.labels.forEach(l => {
+    v.copy(l.pos).project(c);
+    l.el.style.left = ((v.x + 1) / 2 * J3.w) + "px"; l.el.style.top = ((1 - v.y) / 2 * J3.h) + "px";
+    let op = v.z < 1 ? 1 : 0;
+    if (l.view === "nz" && side < 0.25 && !top) op = 0;      // depth axis hidden in the flat front view
+    if (l.view === "ny" && top) op = 0;                       // vertical axis hidden from above
+    l.el.style.opacity = op;
+  });
+  requestAnimationFrame(jus3DFrame);
+}
+function startJus3D(replay){
+  if (!useGlobe) return false;
+  document.getElementById("jus3d").classList.add("on");
+  document.getElementById("jus2d").style.display = "none";
+  document.querySelector(".j3-views").style.display = "";
+  if (!J3) initJus3D(); else buildJus3DLabels();
+  J3.sizeIt();
+  if (replay){ J3.t0 = performance.now(); J3.dist = 36; setJView("3d"); }
+  if (!J3.running){ J3.running = true; requestAnimationFrame(jus3DFrame); }
+  return true;
+}
+function stopJus3D(){ if (J3) J3.running = false; }
+
 
 /* ---------- hover tooltip for bar charts ---------- */
 function barTip(svg, bars, html, hits){
