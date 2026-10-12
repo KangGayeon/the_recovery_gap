@@ -118,16 +118,39 @@ p,.prose,.cap,.log p,details .body{word-break:keep-all; text-wrap:pretty}
 .hm-after .hm-stats b{font-size:clamp(36px,4.6vw,72px)}
 .hm-after .hm-stats span{font-size:15px; display:block; margin-top:10px; max-width:16em}
 @media (max-width:760px){ .hm-after .hm-stats{grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:48px} }
+/* card layer: step text lives in the sticky stage and cross-fades, so it is never cut off by scrolling */
+.card-layer{position:absolute; inset:0; z-index:3; pointer-events:none}
+.cl{position:absolute; inset:0; display:flex; align-items:center; opacity:0; transform:translateY(22px); transition:opacity .55s ease, transform .65s cubic-bezier(.2,.7,.2,1); visibility:hidden}
+.cl.on{opacity:1; transform:none; visibility:visible; transition:opacity .6s ease .12s, transform .7s cubic-bezier(.2,.7,.2,1) .12s}
+.cl .wrap{width:100%}
+.cl .card{opacity:1; transform:none; transition:none; padding:0}
+.cl.on .card, .cl.on .intro-foot{pointer-events:auto}
+.cl.intro{align-items:flex-end}
+.cl.intro .wrap{display:flex; justify-content:center}
+.cl.intro .intro-foot{opacity:1}
+.st .wrap:empty{display:none}
+@media (max-height:780px){
+  .cl .card h1{font-size:clamp(34px,4.4vw,56px)}
+  .cl .card h2{font-size:clamp(26px,3vw,40px); margin-bottom:12px}
+  .cl .card p{font-size:16px; margin-bottom:10px}
+  .cl .card .big b{font-size:56px}
+  .cl .card .duo b{font-size:34px}
+  .cl [data-step] .gap, .cl .gap{padding-top:12px}
+}
+@media (max-height:680px){
+  .cl .card .lede{display:none}
+  .cl .gap-t{display:none}
+}
 /* final step: chart is the main element */
 .gap{position:relative}
 .gap-tip{position:absolute; pointer-events:none; background:#fff; color:#000; font-size:14px; line-height:1.5; padding:10px 12px; border-radius:12px; opacity:0; transform:translateY(4px); transition:opacity .15s, transform .15s; white-space:nowrap; z-index:5}
 .gap-tip.on{opacity:1; transform:none}
 .gap-tip b{font-weight:600}
 #gapChart .hit{cursor:pointer}
-.st[data-step="6"] .card{max-width:680px}
-.st[data-step="6"] .gap{margin-top:12px; padding-top:22px}
-.st[data-step="6"] .gap-t{font-size:15px; color:var(--mist); margin-bottom:12px}
-@media (max-width:760px){ .st[data-step="6"] .card{max-width:none} }
+[data-step="6"] .card{max-width:680px}
+[data-step="6"] .gap{margin-top:12px; padding-top:22px}
+[data-step="6"] .gap-t{font-size:15px; color:var(--mist); margin-bottom:12px}
+@media (max-width:760px){ [data-step="6"] .card{max-width:none} }
 /* unit chart */
 .unit{display:grid; grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr); gap:24px 72px; align-items:center; margin-top:96px}
 .unit-n{margin:0; color:#fff}
@@ -160,7 +183,7 @@ p,.prose,.cap,.log p,details .body{word-break:keep-all; text-wrap:pretty}
 .st.intro.on .intro-foot{opacity:1}
 .intro-foot .legend2{margin:0; justify-content:center}
 .intro-foot .cue{margin:0; flex-direction:column; gap:10px}
-.shade{transition:opacity .8s; position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(90deg, var(--deep) 0%, var(--deep) 26%, rgba(0,0,0,0) 52%)}
+.shade{transition:opacity .8s; position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(90deg, var(--deep) 0%, var(--deep) 30%, rgba(0,0,0,0) 58%)}
 .strip{position:absolute; left:0; right:0; bottom:6px; height:52px; z-index:3; pointer-events:none}
 .strip svg{width:100%; height:52px}
 .progress{position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--deep-line); z-index:3}
@@ -177,7 +200,7 @@ p,.prose,.cap,.log p,details .body{word-break:keep-all; text-wrap:pretty}
 .card h2{font-family:var(--serif); font-weight:700; font-size:clamp(26px,3vw,38px); line-height:1.28; margin:0 0 16px; max-width:none}
 .card p{color:var(--on-deep-muted)}
 .card .kick{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--bub-dis); margin-bottom:12px; font-weight:600}
-.st[data-step="4"] .kick,.st[data-step="6"] .kick{color:var(--bub-fin)}
+[data-step="4"] .kick,[data-step="6"] .kick{color:var(--bub-fin)}
 .card .big{margin:0 0 12px; color:var(--on-deep)}
 .card .big b{font-family:var(--serif); font-size:clamp(48px,6vw,76px); line-height:1; font-variant-numeric:tabular-nums; color:var(--bub-dis)}
 .card .big span{font-size:18px; margin-left:6px; color:var(--on-deep-muted)}
@@ -330,6 +353,7 @@ footer .in{display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px
 footer b{color:var(--ink); font-family:var(--serif); font-size:16px}
 
 @media (max-width:760px){
+  .shade{background:linear-gradient(180deg, rgba(0,0,0,0) 40%, #000 70%)!important}
   body{font-size:16px}
   .map-grid{grid-template-columns:1fr}
   .hm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -338,11 +362,13 @@ footer b{color:var(--ink); font-family:var(--serif); font-size:16px}
   .globe-wrap{width:100%; top:8px; bottom:38%}
   .stage.centered .globe-wrap{bottom:20%}
   .shade{background:linear-gradient(180deg, rgba(0,0,0,0) 45%, var(--deep) 72%)}
+  .cl{align-items:flex-end}
+  .cl .card{padding:0 0 76px}
   .year-big{bottom:auto; top:12px; right:12px; font-size:84px}
   .st{align-items:flex-end}
   .card{max-width:none; padding:0 0 70px}
-  .st[data-step="6"] .card .gap{padding:10px 12px 4px}
-  .st[data-step="6"] .card > p:not(.kick){display:none}
+  [data-step="6"] .card .gap{padding:10px 12px 4px}
+  [data-step="6"] .card > p:not(.kick){display:none}
   .scrolly .globe-hint{display:none}
   .strip{height:40px} .strip svg{height:40px}
   .wrap.hm-top{padding-top:36px}
@@ -377,7 +403,7 @@ h3{font-size:24px; letter-spacing:-0.02em}
 p,.prose,.muted{color:var(--mist)}
 a{color:var(--spark)}
 .step,.card .kick{display:block; background:none; padding:0; border-radius:0; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:.025em; color:var(--spark); margin:0 0 18px}
-.st[data-step="4"] .kick,.st[data-step="6"] .kick{color:var(--spark); background:none}
+[data-step="4"] .kick,[data-step="6"] .kick{color:var(--spark); background:none}
 
 /* nav: transparent bar on void, uppercase ghost links */
 .bar-top, body.is-home .bar-top{background:#000; border-bottom:0; backdrop-filter:none; -webkit-backdrop-filter:none; color:#fff; --ink:#fff; --muted:#9A9A9A; --paper:#000; --paper-2:#0D0D0D; --line:#222}
@@ -480,7 +506,7 @@ section.wrap.home-idx{padding-top:120px}
 .meta-in b{font-weight:400}
 .year-big{font-weight:400; letter-spacing:-0.05em; opacity:.07}
 .globe{background:radial-gradient(closest-side, rgba(128,82,255,.16), rgba(128,82,255,.05) 60%, transparent 76%)}
-.shade{background:linear-gradient(90deg,#000 0%,#000 24%,rgba(0,0,0,0) 52%)}
+.shade{background:linear-gradient(90deg,#000 0%,#000 30%,rgba(0,0,0,0) 58%)}
 .card h1{font-size:clamp(44px,5.6vw,80px); line-height:1.02}
 .card h2{font-size:clamp(34px,3.8vw,54px); line-height:1.08}
 .card p{font-weight:200; color:var(--mist); font-size:18px}
@@ -513,6 +539,8 @@ footer b{font-weight:400; color:#fff}
   .card h2{font-size:30px}
   .card p{font-size:16px}
 }
+.lag3d{overflow:hidden}
+html,body{overflow-x:clip}
 </style>
 </head>
 <body>
@@ -761,6 +789,7 @@ footer b{font-weight:400; color:#fff}
     <button type="button" class="chip" role="tab" data-spec="A" aria-pressed="true" data-i18n="tabA"></button>
     <button type="button" class="chip" role="tab" data-spec="B" aria-pressed="false" data-i18n="tabB"></button>
     <button type="button" class="chip" role="tab" data-spec="C" aria-pressed="false" data-i18n="tabC"></button>
+    <button type="button" class="chip" role="tab" data-spec="D" aria-pressed="false" data-i18n="tabD"></button>
   </div>
   <p class="spec-note" id="specNote"></p>
   <div class="figure" style="margin-top:8px">
@@ -948,7 +977,7 @@ ko:{
  s7h:"피해 규모로 다시 본<br>회복 곡선",
  s7step:"발견 3",
  brand:"회복의 격차",
- ctaStart:"이야기 시작하기", ctaMap:"지도 자세히 보기", hmDis:"기후재난", hmFin:"적응금융", play:"자동 전환 재생", pause:"자동 전환 멈춤", globeHint:"드래그하거나 커서를 움직여 지구 회전", mTitle:"제목", mContents:"내용", mYear:"연도", mSpace:"공간", cue:"아래로 스크롤", ctaFin:"적응금융 검증 보기", st0k:"Climate × Economy", st1k:"재난의 증가", st1h:"인간의 삶을 바꾸는 재난", st1u:"건의 기후재난", st1p:"홍수, 폭풍, 가뭄, 폭염. 기후재난은 1990년 216건에서 2024년 406건으로 증가", st2k:"재난의 분포", st2p:"원이 클수록 재난이 잦았던 나라<br>지난 35년간 미국 854건, 중국 682건, 인도 471건", st3k:"돈의 흐름", st3p:"원이 클수록 1인당 지원이 많았던 나라<br>투발루 274달러, 나우루 184달러로<br>해수면 상승에 가장 취약한 섬나라가 상위", st4k:"회복의 격차", st4h:"회복할 수단의 격차", st4a:"고소득국 피해 중 보험 보장", st4b:"중·저소득국", st4p:"성장률로 본 반등은 소득에 따라 뚜렷이 갈리지 않음. 그러나 기후재난 피해 중 보험으로 메워진 비율은 8배 차이", st5k:"남은 질문", st5h:"적응금융은 그 격차를 메울 수 있을까?", st5p:"재난과 적응금융을 한 지구본에 겹쳐 표시. 큰 주황 테두리 안에 하늘색 원이 작은 곳은 재난은 잦으나 지원은 적은 나라", lgFin:"1인당 적응금융", lgDis:"누적 기후재난", gapT:"재난 × 적응금융 상호작용항 (95% 신뢰구간)<br>· 세 설계 모두 0과 구별되지 않음", cIntro:"재난 × 적응금융", c0:"질문", c1:"재난의 증가", c2:"재난의 분포", c3:"돈의 흐름", c4:"회복의 격차", c5:"남은 질문 · 겹쳐 보기", sp0:"지구 전체 · 217개국", sp1:"지구 전체", sp2:"아시아 · 북미", sp3:"태평양 도서국", sp4:"고소득국 vs 중·저소득국", sp5:"재난 × 적응금융", modeDisK:"원 크기: 1990–2024 누적 기후재난 건수", modeDisH:"큰 나라에 쏟아지는 피해", modeFinK:"원 크기: 2000–2024 연평균 1인당 적응금융", modeFinH:"작은 섬나라로 향하는 적응금융", stC:"국가", stD:"기후재난 기록, 1990–2024", stF:"적응금융 약정 총액, 2000–2024", stY:"년의 패널 데이터", barsH:"연도별 기후재난 건수", navHome:"홈", navData:"데이터", iData:"기후재난, 경제성장, 적응금융 세 데이터를 국가와 연도로 엮은 과정", iFind:"재난 다음 해의 반등, 그리고 소득 수준에 따른 차이", iMap:"재난이 잦은 곳과 적응금융이 가는 곳을 지도로 비교", iFin:"적응금융은 회복을 앞당기는가, 세 가지 설계로 검증", iStory:"같은 코드에서 다른 결과가 나온 이유를 추적하며 찾은 문제들", iMethod:"모형, 강건성 검정, 데이터 출처와 한계", navFind:"핵심 발견", navMap:"돈의 흐름", navFin:"적응금융 검증", navStory:"분석의 뒷이야기", navMethod:"방법과 한계", prev:"이전", next:"다음",
+ ctaStart:"이야기 시작하기", ctaMap:"지도 자세히 보기", hmDis:"기후재난", hmFin:"적응금융", play:"자동 전환 재생", pause:"자동 전환 멈춤", globeHint:"드래그하거나 커서를 움직여 지구 회전", mTitle:"제목", mContents:"내용", mYear:"연도", mSpace:"공간", cue:"아래로 스크롤", ctaFin:"적응금융 검증 보기", st0k:"Climate × Economy", st1k:"재난의 증가", st1h:"인간의 삶을 바꾸는 재난", st1u:"건의 기후재난", st1p:"홍수, 폭풍, 가뭄, 폭염. 기후재난은 1990년 216건에서 2024년 406건으로 증가", st2k:"재난의 분포", st2p:"원이 클수록 재난이 잦았던 나라<br>지난 35년간 미국 854건, 중국 682건, 인도 471건", st3k:"돈의 흐름", st3p:"원이 클수록 1인당 지원이 많았던 나라<br>투발루 274달러, 나우루 184달러로<br>해수면 상승에 가장 취약한 섬나라가 상위", st4k:"회복의 격차", st4h:"회복할 수단의 격차", st4a:"고소득국 피해 중 보험 보장", st4b:"중·저소득국", st4p:"성장률로 본 반등은 소득에 따라 뚜렷이 갈리지 않음. 그러나 기후재난 피해 중 보험으로 메워진 비율은 8배 차이", st5k:"남은 질문", st5h:"적응금융은 그 격차를 메울 수 있을까?", st5p:"재난과 적응금융을 한 지구본에 겹쳐 표시. 큰 주황 테두리 안에 하늘색 원이 작은 곳은 재난은 잦으나 지원은 적은 나라", lgFin:"1인당 적응금융", lgDis:"누적 기후재난", gapT:"재난 × 재원 상호작용항 (95% 신뢰구간)<br>· 네 설계 모두 0과 구별되지 않음", cIntro:"재난 × 적응금융", c0:"질문", c1:"재난의 증가", c2:"재난의 분포", c3:"돈의 흐름", c4:"회복의 격차", c5:"남은 질문 · 겹쳐 보기", sp0:"지구 전체 · 217개국", sp1:"지구 전체", sp2:"아시아 · 북미", sp3:"태평양 도서국", sp4:"고소득국 vs 중·저소득국", sp5:"재난 × 적응금융", modeDisK:"원 크기: 1990–2024 누적 기후재난 건수", modeDisH:"큰 나라에 쏟아지는 피해", modeFinK:"원 크기: 2000–2024 연평균 1인당 적응금융", modeFinH:"작은 섬나라로 향하는 적응금융", stC:"국가", stD:"기후재난 기록, 1990–2024", stF:"적응금융 약정 총액, 2000–2024", stY:"년의 패널 데이터", barsH:"연도별 기후재난 건수", navHome:"홈", navData:"데이터", iData:"기후재난, 경제성장, 적응금융 세 데이터를 국가와 연도로 엮은 과정", iFind:"재난 다음 해의 반등, 그리고 소득 수준에 따른 차이", iMap:"재난이 잦은 곳과 적응금융이 가는 곳을 지도로 비교", iFin:"적응금융과 보험시장 깊이는 회복을 앞당기는가, 네 가지 설계로 검증", iStory:"같은 코드에서 다른 결과가 나온 이유를 추적하며 찾은 문제들", iMethod:"모형, 강건성 검정, 데이터 출처와 한계", navFind:"핵심 발견", navMap:"돈의 흐름", navFin:"적응금융 검증", navStory:"분석의 뒷이야기", navMethod:"방법과 한계", prev:"이전", next:"다음",
  h1:"재난이 지나간 뒤, 경제는 다시 일어서는가",
  lede:"217개국 35년치 기후재난과 경제성장률을 연결해, 재난 뒤 회복의 차이가 어디서 생기는지와 국제 기후적응금융이 그 차이를 메우는지 추적한 데이터 프로젝트",
  heroCapL:"1990년 기후재난 216건",
@@ -983,18 +1012,22 @@ ko:{
  rankGr:"평균 성장률 상위 (1990–2024)",
  s4step:"발견 3",
  s4h:"적응금융은 그 격차를 메우는가",
- s4p:"적응금융을 많이 받은 나라일수록 재난 뒤 반등이 커진다면 재난 1년 시차와 적응금융의 상호작용항이 양수여야 함. 변수 설계를 세 번 바꿔 검증",
+ s4p:"적응금융을 많이 받은 나라일수록 재난 뒤 반등이 커진다면 재난 1년 시차와 적응금융의 상호작용항이 양수여야 함. 변수 설계를 네 번 바꿔 검증. 네 번째는 사후 원조가 아닌, 재난 전부터 있던 보험시장의 깊이로 같은 질문을 다시 물음(von Peter, von Dahlen & Saxena, 2024)",
  tabA:"설계 A: 연간 유입액",
  tabB:"설계 B: 기간 보정",
  tabC:"설계 C: 재난 전 5년 누적",
+ tabD:"설계 D: 보험 침투율",
  specA:"연간 적응금융 유입액(로그). 1990년대처럼 기록이 없는 해가 0으로 들어가 있던 초기 설계. 관측치 5,931, 192개국",
  specB:"적응금융 데이터가 존재하는 2000–2024년으로 기간 제한. 관측치 4,409, 192개국",
  specC:"재난 이전 5년간 누적된 1인당 적응금융, 수혜국 128개국만, 2006–2024년. 규모 차이와 역인과를 줄인 설계. 관측치 2,277",
+ specD:"재난 1년 전 비생명보험 보험료/GDP(World Bank GFDD). 사후 원조인 적응금융 대신, 재난 전부터 있던 보험시장의 깊이로 같은 상호작용을 검증. 보험 데이터가 있는 1990–2020년, 관측치 4,146, 162개국",
  cDis:"재난 (1년 시차)",
  cFin:"적응금융",
+ cFinD:"보험 침투율(비생명보험/GDP)",
  cInt:"재난 × 적응금융",
+ cIntD:"재난 × 보험 침투율",
  s4cap:"계수와 95% 신뢰구간(국가 단위 클러스터 표준오차). 세로선은 0. 신뢰구간이 0을 지나면 효과 확인 불가",
- s4verdict:"세 설계 모두에서 상호작용항은 음수이며 유의하지 않음.<br>현재 데이터로는 적응금융이 재난 뒤 회복을 앞당긴다는 증거 없음.<br>효과가 없다는 뜻이 아닌, 확인할 수 없다는 뜻.",
+ s4verdict:"네 설계 모두에서 상호작용항은 0과 구별되지 않음.<br>원조성 적응금융도, 국가의 일반적 보험시장 깊이도 재난 뒤 반등을 앞당긴다는 증거는 확인되지 않음.<br>von Peter 외(2024)는 핵심이 '보험 가입 여부'가 아니라 '이 재난의 피해가 사전에 보험으로 이전되었는가'에 있다고 봄. 비생명보험 침투율은 그 대리지표일 뿐이라, 효과가 없는 게 아니라 이 데이터로는 재지 못하는 것일 수 있음. 전세계 재난 손실 중 국제적으로 재보험된 몫이 2%에 불과한 현실과 같은 빈틈",
  s5step:"분석의 뒷이야기",
  s5h:"결과보다 오래 걸린 일, 숫자를 의심하기",
  s5p:"같은 코드를 다시 돌렸을 때 값이 달라졌고, 그 이유를 끝까지 추적하며 결론을 바꿀 수 있는 문제들을 발견",
@@ -1018,7 +1051,7 @@ ko:{
  m2h:"강건성 검정",
  m2p:"<ul><li>선행효과(플라시보): 내년 재난이 올해 성장률과 관련되지 않는지 확인</li><li>2년 시차: 반등이 1년 차에 집중되는지 확인</li><li>위양성 검정: 기후와 무관한 지진으로 같은 패턴이 나오는지 확인</li><li>극단값 처리(winsorization) 후 재추정</li><li>소득그룹별 이질성 분석</li><li>피해 규모 기준 사건 연구(GDP 대비 0.5% 이상 피해, 국소 투영법)</li><li>민간신용·국가부채와의 상호작용 검증</li></ul>",
  m3h:"데이터 출처",
- m3p:"<ul><li>EM-DAT, CRED / UCLouvain: 국제재난데이터베이스</li><li>World Bank, World Development Indicators</li><li>OECD, Climate-related Development Finance (수원국 기준, 2000–2024, 적응이 주목적인 사업만)</li><li>Green Climate Fund, Open Data API (승인·집행 사업, 2026년 10월 조회)</li><li>Our World in Data, CO₂ and Greenhouse Gas Emissions (Global Carbon Project 기반)</li><li>UNEP, Adaptation Gap Report 2025</li></ul>",
+ m3p:"<ul><li>EM-DAT, CRED / UCLouvain: 국제재난데이터베이스</li><li>World Bank, World Development Indicators</li><li>World Bank, Global Financial Development Database (비생명보험 보험료/GDP, GFDD.DI.10)</li><li>OECD, Climate-related Development Finance (수원국 기준, 2000–2024, 적응이 주목적인 사업만)</li><li>Green Climate Fund, Open Data API (승인·집행 사업, 2026년 10월 조회)</li><li>Our World in Data, CO₂ and Greenhouse Gas Emissions (Global Carbon Project 기반)</li><li>UNEP, Adaptation Gap Report 2025</li></ul>",
  m4h:"한계",
  m4p:"<ul><li>연간 GDP 성장률은 회복을 재기에 거친 지표</li><li>재난 건수는 피해 규모를 반영하지 못함. 피해액이나 피해 인구 기준의 강도 변수 필요</li><li>적응금융은 약정액 기준이라 실제 집행과 다를 수 있음</li><li>적응금융은 적응이 주목적인 사업만 포함. 부수목적 사업과 다자개발은행의 기후 구성요소, 국가에 배정되지 않은 지역·글로벌 사업은 제외</li><li>수혜국 표본이 작아 검정력이 제한적</li></ul>",
  fName:"강가연",
@@ -1131,7 +1164,7 @@ en:{
  s7h:"The recovery curve,<br>measured by damage",
  s7step:"Finding 3",
  brand:"The Recovery Gap",
- ctaStart:"Start the story", ctaMap:"Explore the map", hmDis:"Disasters", hmFin:"Adaptation finance", play:"Play auto-switch", pause:"Pause auto-switch", globeHint:"Drag or move your cursor to spin the globe", mTitle:"Title", mContents:"Contents", mYear:"Year", mSpace:"Space", cue:"Scroll down", ctaFin:"See the finance test", st0k:"Climate × Economy", st1k:"Rising disasters", st1h:"Disasters are changing human life,", st1u:" climate disasters", st1p:"Floods, storms, droughts, heatwaves. From 216 climate disasters in 1990 to 406 in 2024.", st2k:"Where they strike", st2p:"Larger circles mark more frequent disasters.<br>Over the past 35 years, the US 854, China 682, India 471.", st3k:"Where money flows", st3p:"Larger circles mark more support per person.<br>Tuvalu $274 and Nauru $184 lead, the island states most exposed to sea-level rise.", st4k:"The recovery gap", st4h:"A gap in the means to recover", st4a:"High-income losses insured", st4b:"Middle & low income", st4p:"Measured by growth, the rebound does not clearly split by income. But the share of climate-disaster losses covered by insurance differs eightfold.", st5k:"Open question", st5h:"Can adaptation finance close that gap?", st5p:"Disasters and adaptation finance on one globe. Where a large orange ring holds only a small blue disc, disasters are frequent but support is thin.", lgFin:"Adaptation finance per person", lgDis:"Total climate disasters", gapT:"Disaster × finance interaction (95% CI)<br>· none distinguishable from zero", cIntro:"Disasters × finance", c0:"Question", c1:"Rising disasters", c2:"Where they strike", c3:"Where money flows", c4:"The recovery gap", c5:"Open question · overlay", sp0:"Whole Earth · 217 countries", sp1:"Whole Earth", sp2:"Asia · North America", sp3:"Pacific island states", sp4:"High vs middle & low income", sp5:"Disasters × finance", modeDisK:"Circle size: climate disasters, 1990–2024 total", modeDisH:"Damage piles up in large, populous countries,", modeFinK:"Circle size: adaptation finance per person, 2000–2024 average", modeFinH:"while adaptation finance flows to small islands.", stC:"countries", stD:"climate disasters recorded, 1990–2024", stF:"adaptation finance committed, 2000–2024", stY:"years of panel data", barsH:"Climate disasters per year", navHome:"Home", navData:"Data", iData:"How three datasets on disasters, growth and adaptation finance were joined by country and year", iFind:"The rebound the year after a disaster, and how it differs by income", iMap:"Where disasters strike versus where adaptation finance goes", iFin:"Does adaptation finance speed recovery? Tested with three designs", iStory:"Problems found by tracing why the same code gave different results", iMethod:"Model, robustness checks, data sources and limitations", navFind:"Key findings", navMap:"Money flows", navFin:"Adaptation finance", navStory:"Behind the analysis", navMethod:"Methods", prev:"Previous", next:"Next",
+ ctaStart:"Start the story", ctaMap:"Explore the map", hmDis:"Disasters", hmFin:"Adaptation finance", play:"Play auto-switch", pause:"Pause auto-switch", globeHint:"Drag or move your cursor to spin the globe", mTitle:"Title", mContents:"Contents", mYear:"Year", mSpace:"Space", cue:"Scroll down", ctaFin:"See the finance test", st0k:"Climate × Economy", st1k:"Rising disasters", st1h:"Disasters are changing human life,", st1u:" climate disasters", st1p:"Floods, storms, droughts, heatwaves. From 216 climate disasters in 1990 to 406 in 2024.", st2k:"Where they strike", st2p:"Larger circles mark more frequent disasters.<br>Over the past 35 years, the US 854, China 682, India 471.", st3k:"Where money flows", st3p:"Larger circles mark more support per person.<br>Tuvalu $274 and Nauru $184 lead, the island states most exposed to sea-level rise.", st4k:"The recovery gap", st4h:"A gap in the means to recover", st4a:"High-income losses insured", st4b:"Middle & low income", st4p:"Measured by growth, the rebound does not clearly split by income. But the share of climate-disaster losses covered by insurance differs eightfold.", st5k:"Open question", st5h:"Can adaptation finance close that gap?", st5p:"Disasters and adaptation finance on one globe. Where a large orange ring holds only a small blue disc, disasters are frequent but support is thin.", lgFin:"Adaptation finance per person", lgDis:"Total climate disasters", gapT:"Disaster × financing interaction (95% CI)<br>· none of the four designs distinguishable from zero", cIntro:"Disasters × finance", c0:"Question", c1:"Rising disasters", c2:"Where they strike", c3:"Where money flows", c4:"The recovery gap", c5:"Open question · overlay", sp0:"Whole Earth · 217 countries", sp1:"Whole Earth", sp2:"Asia · North America", sp3:"Pacific island states", sp4:"High vs middle & low income", sp5:"Disasters × finance", modeDisK:"Circle size: climate disasters, 1990–2024 total", modeDisH:"Damage piles up in large, populous countries,", modeFinK:"Circle size: adaptation finance per person, 2000–2024 average", modeFinH:"while adaptation finance flows to small islands.", stC:"countries", stD:"climate disasters recorded, 1990–2024", stF:"adaptation finance committed, 2000–2024", stY:"years of panel data", barsH:"Climate disasters per year", navHome:"Home", navData:"Data", iData:"How three datasets on disasters, growth and adaptation finance were joined by country and year", iFind:"The rebound the year after a disaster, and how it differs by income", iMap:"Where disasters strike versus where adaptation finance goes", iFin:"Do adaptation finance and insurance-market depth speed recovery? Tested with four designs", iStory:"Problems found by tracing why the same code gave different results", iMethod:"Model, robustness checks, data sources and limitations", navFind:"Key findings", navMap:"Money flows", navFin:"Adaptation finance", navStory:"Behind the analysis", navMethod:"Methods", prev:"Previous", next:"Next",
  h1:"After a disaster, does the economy get back up?",
  lede:"A data project linking 35 years of climate disasters and GDP growth across 217 countries, tracing where differences in recovery come from and whether international adaptation finance closes the gap.",
  heroCapL:"1990: 216 climate disasters",
@@ -1166,18 +1199,22 @@ en:{
  rankGr:"Highest average growth (1990–2024)",
  s4step:"Finding 3",
  s4h:"Does adaptation finance close the gap?",
- s4p:"If countries receiving more adaptation finance rebound more strongly after disasters, the interaction between lagged disasters and adaptation finance should be positive. I tested this with three variable designs.",
+ s4p:"If countries receiving more adaptation finance rebound more strongly after disasters, the interaction between lagged disasters and adaptation finance should be positive. I tested this with four variable designs. The fourth asks the same question using the depth of the insurance market that already existed before the disaster, not post-disaster aid (von Peter, von Dahlen & Saxena, 2024).",
  tabA:"Design A: annual inflow",
  tabB:"Design B: corrected period",
  tabC:"Design C: 5-year pre-disaster stock",
+ tabD:"Design D: insurance penetration",
  specA:"Log annual adaptation inflow. The first design, where years with no records, such as the 1990s, were coded as zero. 5,931 observations, 192 countries.",
  specB:"Restricted to 2000–2024, when adaptation finance data exist. 4,409 observations, 192 countries.",
  specC:"Per-person adaptation finance accumulated over the five years before the disaster, recipients only, 2006–2024. Reduces size bias and reverse causality. 2,277 observations, 128 countries.",
+ specD:"Non-life insurance premium volume to GDP, one year before the disaster (World Bank GFDD). Tests the same interaction using the depth of the pre-existing insurance market instead of post-disaster aid. 1990–2020, when insurance data exist. 4,146 observations, 162 countries.",
  cDis:"Disaster (1-yr lag)",
  cFin:"Adaptation finance",
+ cFinD:"Insurance penetration (non-life/GDP)",
  cInt:"Disaster × finance",
+ cIntD:"Disaster × insurance penetration",
  s4cap:"Coefficients with 95% confidence intervals (standard errors clustered by country). The vertical line is zero; an interval crossing it means the effect cannot be confirmed.",
- s4verdict:"In all three designs the interaction was negative and not significant.<br>With current data, there is no evidence that adaptation finance speeds recovery after disasters.<br>That is not proof of no effect, only that none can be confirmed.",
+ s4verdict:"In all four designs the interaction is not distinguishable from zero.<br>Neither aid-style adaptation finance nor a country's general insurance-market depth shows evidence of speeding recovery after a disaster.<br>von Peter et al. (2024) argue the key is not whether a country has insurance, but whether this disaster's losses were specifically transferred beforehand. Non-life insurance penetration is only a proxy for that — so this may be a case of not being able to measure the effect, rather than there being none. The same gap shows up globally: only 2% of disaster losses worldwide are reinsured internationally.",
  s5step:"Behind the analysis",
  s5h:"Doubting the numbers took longer than getting them",
  s5p:"Re-running the same code gave different results. Tracing why uncovered problems that could have changed the conclusions.",
@@ -1201,7 +1238,7 @@ en:{
  m2h:"Robustness checks",
  m2p:"<ul><li>Lead (placebo): next year’s disasters should not relate to this year’s growth</li><li>Two-year lag: whether the rebound concentrates in year one</li><li>Falsification: whether non-climate earthquakes produce the same pattern</li><li>Re-estimation after winsorising extreme values</li><li>Heterogeneity by income group</li><li>Damage-based event study (losses ≥ 0.5% of GDP, local projections)</li><li>Interactions with private credit and government debt</li></ul>",
  m3h:"Data sources",
- m3p:"<ul><li>EM-DAT, CRED / UCLouvain: International Disaster Database</li><li>World Bank, World Development Indicators</li><li>OECD, Climate-related Development Finance (recipient perspective, 2000–2024, projects with adaptation as principal objective)</li><li>Green Climate Fund, Open Data API (approved and disbursed projects, accessed October 2026)</li><li>Our World in Data, CO₂ and Greenhouse Gas Emissions (based on the Global Carbon Project)</li><li>UNEP, Adaptation Gap Report 2025</li></ul>",
+ m3p:"<ul><li>EM-DAT, CRED / UCLouvain: International Disaster Database</li><li>World Bank, World Development Indicators</li><li>World Bank, Global Financial Development Database (non-life insurance premium volume to GDP, GFDD.DI.10)</li><li>OECD, Climate-related Development Finance (recipient perspective, 2000–2024, projects with adaptation as principal objective)</li><li>Green Climate Fund, Open Data API (approved and disbursed projects, accessed October 2026)</li><li>Our World in Data, CO₂ and Greenhouse Gas Emissions (based on the Global Carbon Project)</li><li>UNEP, Adaptation Gap Report 2025</li></ul>",
  m4h:"Limitations",
  m4p:"<ul><li>Annual GDP growth is a coarse measure of recovery.</li><li>Disaster counts ignore severity; damage- or population-affected intensity measures are needed.</li><li>Adaptation finance is measured as commitments, which may differ from disbursements.</li><li>Adaptation finance covers principal-objective projects only, excluding significant-objective projects, MDB climate components and regional or global programmes not assigned to a country.</li><li>The recipient sample is small, limiting statistical power.</li></ul>",
  fName:"Gayeon Kang",
@@ -1212,7 +1249,8 @@ en:{
 const COEF = {
  A:{dis:[0.6806,0.2934,1.0677,0.0006], fin:[0.1078,0.0002,0.2154,0.0496], int:[-0.0511,-0.1146,0.0123,0.1142]},
  B:{dis:[0.4165,-0.0131,0.8462,0.0574], fin:[0.0193,-0.0942,0.1327,0.7392], int:[-0.0341,-0.1006,0.0324,0.3146]},
- C:{dis:[0.2871,-0.3447,0.9188,0.3730], fin:[0.1486,-0.2398,0.5370,0.4531], int:[-0.1604,-0.4806,0.1598,0.3260]}
+ C:{dis:[0.2871,-0.3447,0.9188,0.3730], fin:[0.1486,-0.2398,0.5370,0.4531], int:[-0.1604,-0.4806,0.1598,0.3260]},
+ D:{dis:[0.1003,-0.0670,0.2676,0.2401], fin:[-0.2513,-0.6410,0.1384,0.2062], int:[-0.0186,-0.1100,0.0727,0.6893]}
 };
 
 let lang = "ko", layer = "dis", spec = "A";
@@ -1390,13 +1428,21 @@ function drawMoneyYear(animate){
 
 /* ---------- money: adaptation objective ---------- */
 const M_OBJ = [["oAll", [88016568, 259064679, 185703853], true], ["mLDC", [0.15, 0.489, 0.361], false], ["mLMIC", [0.14, 0.392, 0.468], false], ["mUMIC", [0.122, 0.388, 0.49], false], ["mUnal", [0.25, 0.676, 0.074], false]];
+const M_OBJ_TOT = {"mLDC": 144023893, "mLMIC": 145224286, "mUMIC": 114179852, "mUnal": 128140840};   // group totals (thousand USD): principal amount ÷ principal share
 function drawMoneyObj(animate){
   const svg = d3.select("#moneyObj"); if (svg.empty()) return;
-  const W = 1000, rowH = 64, m = {t:6, r:20, b:10, l:220}, H = m.t + m.b + M_OBJ.length * rowH + 16;
+  const W = 1000, rowH = 64, m = {t:30, r:150, b:10, l:220}, H = m.t + m.b + M_OBJ.length * rowH + 16;
   svg.attr("viewBox", `0 0 ${W} ${H}`); svg.selectAll("*").remove();
   const x = d3.scaleLinear().domain([0, 1]).range([m.l, W - m.r]);
   const cols = [css("--growth"), css("--storm"), "#5A5A5A"], keys = ["oPr", "oSig", "oComp"];
   const rowY = i => m.t + i * rowH + (i > 0 ? 16 : 0);
+  // totals column, shown up front
+  svg.append("text").attr("x", W - 4).attr("y", 16).attr("text-anchor", "end").attr("font-size", 13).attr("fill", "#9A9A9A").text(lang === "ko" ? "금액 (2000–2024)" : "Amount (2000–2024)");
+  M_OBJ.forEach(([k, v, abs], i) => {
+    const tot = abs ? v[0] + v[1] + v[2] : M_OBJ_TOT[k];
+    svg.append("text").attr("x", W - 4).attr("y", rowY(i) + rowH / 2).attr("text-anchor", "end").attr("dominant-baseline", "middle")
+      .attr("font-size", i === 0 ? 22 : 17).attr("font-weight", i === 0 ? 600 : 400).attr("fill", "#fff").text((abs ? "" : (lang === "ko" ? "약 " : "≈ ")) + usdK(tot));
+  });
   const segs = [];
   M_OBJ.forEach(([k, v, abs], i) => { const tot = v[0] + v[1] + v[2]; let acc = 0;
     v.forEach((a, j) => { segs.push({row:i, k, j, s:a / tot, x0:acc, amt: abs ? a : null, tot: abs ? tot : null}); acc += a / tot; }); });
@@ -1412,8 +1458,13 @@ function drawMoneyObj(animate){
   if (animate && !reduce) bars.transition().delay(d => 150 + d.row * 120).duration(800).ease(d3.easeCubicOut).attr("width", d => Math.max(0, x(d.x0 + d.s) - x(d.x0)));
   g.selectAll("text.pct").data(segs.filter(d => d.s >= 0.08)).join("text").attr("class", "pct")
     .attr("x", d => x(d.x0) + 12).attr("y", d => rowY(d.row) + rowH / 2).attr("dominant-baseline", "middle").attr("font-size", 15).attr("font-weight", 600)
-    .attr("fill", d => d.j === 2 ? "#fff" : "#000").text(d => (d.s * 100).toFixed(d.row === 0 ? 1 : 0) + "%");
-  barTip(svg, bars, d => `<b>${t(d.k)}</b><br>${t(keys[d.j])}<br>${(d.s * 100).toFixed(1)}%${d.amt != null ? " · " + usdK(d.amt) + `<br><span class="bt-sub">${lang === "ko" ? "전체" : "Total"} ${usdK(d.tot)}</span>` : ""}`);
+    .attr("fill", d => d.j === 2 ? "#fff" : "#000").attr("dy", d => d.row === 0 ? -8 : 0).text(d => (d.s * 100).toFixed(d.row === 0 ? 1 : 0) + "%");
+  // the "all" row also shows each segment's amount on a second line
+  g.selectAll("text.amt").data(segs.filter(d => d.amt != null)).join("text").attr("class", "amt")
+    .attr("x", d => x(d.x0) + 12).attr("y", d => rowY(d.row) + rowH / 2 + 10).attr("dominant-baseline", "middle").attr("font-size", 13).attr("font-weight", 400)
+    .attr("fill", d => d.j === 2 ? "#fff" : "#000").text(d => usdK(d.amt));
+  barTip(svg, bars, d => { const tot = d.tot != null ? d.tot : M_OBJ_TOT[d.k], amt = d.amt != null ? d.amt : tot * d.s, ap = d.amt != null ? "" : (lang === "ko" ? "약 " : "≈ ");
+    return `<b>${t(d.k)}</b><br>${t(keys[d.j])}<br>${(d.s * 100).toFixed(1)}% · ${ap}${usdK(amt)}<br><span class="bt-sub">${lang === "ko" ? "그룹 전체" : "Group total"} ${ap}${usdK(tot)}</span>`; });
   svg.attr("aria-label", lang === "ko" ? "적응 목적별 적응금융 비중: 주목적 16.5%, 부수목적 48.6%, 기후 구성요소 34.9%" : "Adaptation finance by objective: principal 16.5%, significant 48.6%, climate component 34.9%");
 }
 
@@ -1513,10 +1564,11 @@ const GCF_YR = [[2015, 0.168, 0.131, 8], [2016, 1.264, 0.98, 27], [2017, 1.158, 
 const GCF_TH = [["Adaptation", 6.051, 2.229, 168], ["Mitigation", 6.572, 2.583, 84], ["Cross-cutting", 8.709, 2.546, 120]];
 const bnf = v => lang === "ko" ? "$" + d3.format(",.1f")(v * 10) + "억" : "$" + d3.format(",.2f")(v) + "bn";
 function drawGcfNums(){ document.querySelectorAll("[data-gcfnum]").forEach(el => { const v = +el.dataset.gcfnum; el.textContent = lang === "ko" ? v + "억" : (v / 10).toFixed(1) + "bn"; }); }
-let gcfTimer = null;
+let gcfTimer = null, gcfIO = null;
 function drawGcfYear(animate){
   const svg = d3.select("#gcfYear"); if (svg.empty()) return;
   if (gcfTimer){ gcfTimer.stop(); gcfTimer = null; }
+  if (gcfIO){ gcfIO.disconnect(); gcfIO = null; }       // drop any observer left over from an earlier visit
   const W = 1000, H = 340, m = {t:34, r:10, b:32, l:60};
   svg.attr("viewBox", `0 0 ${W} ${H}`); svg.selectAll("*").remove();
   const x = d3.scaleBand().domain(GCF_YR.map(d => d[0])).range([m.l, W - m.r]).padding(0.28);
@@ -1577,8 +1629,10 @@ function drawGcfYear(animate){
   if (animate && !reduce){
     render(0, false);                                   // empty glasses until the chart scrolls into view
     if (window.IntersectionObserver){
-      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ io.disconnect(); if (!gcfTimer) start(); } }, {threshold:0.35});
-      io.observe(svg.node());
+      gcfIO = new IntersectionObserver(es => {
+        if (es.some(e => e.isIntersecting)){ gcfIO.disconnect(); gcfIO = null; if (gcfTimer) gcfTimer.stop(); start(); }
+      }, {threshold:0.35});
+      gcfIO.observe(svg.node());
     } else start();
   } else render(0, true);
   const hits = g.selectAll("rect.h").data(GCF_YR).join("rect").attr("class","h").attr("x", d => x(d[0]) - x.step() * x.paddingInner() / 2).attr("width", x.step()).attr("y", m.t).attr("height", H - m.t - m.b).attr("fill","transparent");
@@ -1856,31 +1910,40 @@ function drawFin(animate){
 
 /* ---------- dot + CI helper ---------- */
 function ciChart(sel, rows, domain, opt = {}){
-  const W = 1000, rowH = opt.rowH || 78, m = {t:10, r:30, b:36, l:opt.l || 230};
-  const H = m.t + m.b + rows.length * rowH;
+  const W = 1000, rowH = opt.rowH || 78, b = {t:10, r:30, b:36};
+  const H = b.t + b.b + rows.length * rowH;
   const svg = d3.select(sel).attr("viewBox", `0 0 ${W} ${H}`);
-  const x = d3.scaleLinear().domain(domain).range([m.l, W - m.r]);
   let g = svg.select("g.root");
   if (g.empty()){
     g = svg.append("g").attr("class","root");
     g.append("g").attr("class","axis xa");
     g.append("line").attr("class","zero");
   }
-  g.select(".xa").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).ticks(6).tickSize(-(H-m.t-m.b))).call(a=>a.select(".domain").remove()).call(a=>a.selectAll("line").attr("stroke-opacity",0.5));
-  g.select(".zero").attr("x1",x(0)).attr("x2",x(0)).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",css("--ink")).attr("stroke-width",1.5);
   const dur = (opt.animate || opt.grow) && !reduce ? (opt.grow ? 700 : 450) : 0;
   const row = g.selectAll("g.row").data(rows, d=>d.key).join(enter => {
     const r = enter.append("g").attr("class","row");
-    r.append("text").attr("class","lab").attr("x", m.l - 18).attr("text-anchor","end").attr("dominant-baseline","middle").attr("font-size",17).attr("fill",css("--ink"));
-    r.append("text").attr("class","sub").attr("x", m.l - 18).attr("text-anchor","end").attr("font-size",13).attr("fill",css("--muted"));
+    r.append("text").attr("class","lab").attr("text-anchor","end").attr("dominant-baseline","middle").attr("font-size",17).attr("fill",css("--ink"));
+    r.append("text").attr("class","sub").attr("text-anchor","end").attr("font-size",13).attr("fill",css("--muted"));
     r.append("line").attr("class","ci").attr("stroke-width",3).attr("stroke-linecap","round");
     r.append("circle").attr("class","pt").attr("r",8).attr("stroke-width",2.5);
     r.append("text").attr("class","val").attr("font-size",14).attr("dominant-baseline","middle");
     return r;
   });
-  row.attr("transform",(d,i)=>`translate(0,${m.t + i*rowH + rowH/2})`);
+  row.attr("transform",(d,i)=>`translate(0,${b.t + i*rowH + rowH/2})`);
   row.select(".lab").text(d=>d.label).attr("y", d=>d.sub ? -8 : 0).attr("fill",css("--ink"));
   row.select(".sub").text(d=>d.sub || "").attr("y", 14).attr("fill",css("--muted"));
+  let maxLab = 0;
+  row.each(function(){
+    const lab = this.querySelector(".lab"), sub = this.querySelector(".sub");
+    if (lab) maxLab = Math.max(maxLab, lab.getComputedTextLength());
+    if (sub) maxLab = Math.max(maxLab, sub.getComputedTextLength());
+  });
+  const m = {t:b.t, r:b.r, b:b.b, l: Math.max(opt.l || 230, Math.ceil(maxLab) + 38)};
+  const x = d3.scaleLinear().domain(domain).range([m.l, W - m.r]);
+  row.select(".lab").attr("x", m.l - 18);
+  row.select(".sub").attr("x", m.l - 18);
+  g.select(".xa").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).ticks(6).tickSize(-(H-m.t-m.b))).call(a=>a.select(".domain").remove()).call(a=>a.selectAll("line").attr("stroke-opacity",0.5));
+  g.select(".zero").attr("x1",x(0)).attr("x2",x(0)).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",css("--ink")).attr("stroke-width",1.5);
   if (opt.grow && !reduce){ row.select(".ci").attr("x1",d=>x(d.est)).attr("x2",d=>x(d.est)); row.select(".pt").attr("cx",d=>x(d.est)).attr("r",0); }
   row.select(".ci").attr("stroke", d=>d.color).transition().duration(dur).attr("x1",d=>x(d.lo)).attr("x2",d=>x(d.hi));
   row.select(".pt").attr("stroke", d=>d.color).attr("fill", d=>d.sig ? d.color : css("--paper"))
@@ -1889,7 +1952,6 @@ function ciChart(sel, rows, domain, opt = {}){
     .transition().duration(dur).attr("x",d=>Math.min(Math.max(x(d.est), m.l+70), W-m.r-70)).attr("y",-22);
   svg.attr("aria-label", rows.map(r=>`${r.label}: ${r.text}`).join("; "));
 }
-
 function drawLag(grow){
   const ko = lang === "ko";
   d3.select("#lagChart").selectAll("*").remove();
@@ -2062,8 +2124,8 @@ function drawInc(grow){
 
 function drawCoef(animate, grow){
   const c = COEF[spec], ko = lang === "ko";
-  const mk = (key, arr, color) => ({key, label:t(key==="dis"?"cDis":key==="fin"?"cFin":"cInt"), est:arr[0], lo:arr[1], hi:arr[2], p:arr[3], sig:arr[3] < 0.05, color, text:`${arr[0].toFixed(2)} (${arr[3] < 0.001 ? "p<0.001" : "p=" + arr[3].toFixed(3)})`});
-  ciChart("#coefChart", [mk("dis",c.dis,css("--silt")), mk("fin",c.fin,css("--growth")), mk("int",c.int,css("--storm"))], [-0.6, 1.15], {animate, grow, l:230});
+  const mk = (key, arr, color) => ({key, label:t(key==="dis"?"cDis":key==="fin"?(spec==="D"?"cFinD":"cFin"):(spec==="D"?"cIntD":"cInt")), est:arr[0], lo:arr[1], hi:arr[2], p:arr[3], sig:arr[3] < 0.05, color, text:`${arr[0].toFixed(2)} (${arr[3] < 0.001 ? "p<0.001" : "p=" + arr[3].toFixed(3)})`});
+  ciChart("#coefChart", [mk("dis",c.dis,css("--silt")), mk("fin",c.fin,css("--growth")), mk("int",c.int,css("--storm"))], [-0.7, 1.15], {animate, grow, l:230});
   // hover: one full-width hit band per row with the row's numbers
   const svg = d3.select("#coefChart"), rows = svg.selectAll("g.row");
   rows.selectAll("rect.hit").remove();
@@ -2320,7 +2382,8 @@ function globeFrame(now){
   G.group.rotation.set(G.rotX, G.rotY, 0);
   // framing: centered globe on the intro, shifted right beside the text on later steps
   const narrow = G.w < 760;
-  const offT = (G.centered || narrow) ? 0 : -G.w * (G.shift || 0.17), zT = G.zoomTarget || 1;
+  const mid = G.w < 1400 && !narrow;                     // laptops: push the globe further right and a bit smaller so it clears the text
+  const offT = (G.centered || narrow) ? 0 : -G.w * ((G.shift || 0.17) + (mid ? 0.05 : 0)), zT = (G.zoomTarget || 1) * (mid && !G.centered ? 1.08 : 1);
   const k = reduce ? 1 : 0.06;
   G.off += (offT - G.off) * k; G.zoom += (zT - G.zoom) * k;
   G.camera.position.z = G.baseZ * G.zoom;
@@ -2404,8 +2467,24 @@ function drawHomeMap(animate){
   }
   updateMeta();
 }
+function buildCardLayer(){
+  const stage = document.querySelector(".stage"); if (!stage || stage.querySelector(".card-layer")) return;
+  const layer = document.createElement("div"); layer.className = "card-layer";
+  document.querySelectorAll(".steps .st").forEach(st => {
+    const cl = document.createElement("div");
+    cl.className = "cl" + (st.classList.contains("intro") ? " intro" : "");
+    cl.dataset.step = st.dataset.step;
+    const wrap = st.querySelector(".wrap");
+    cl.appendChild(wrap);                       // the scroll spacer stays behind; its content moves into the stage
+    st.appendChild(Object.assign(document.createElement("div"), {className:"wrap"}));
+    layer.appendChild(cl);
+  });
+  stage.appendChild(layer);
+}
+buildCardLayer();
 function updateMeta(){
   drawGap();
+  document.querySelectorAll(".cl").forEach(el => el.classList.toggle("on", +el.dataset.step === curStep));
   const st = STEPS[curStep];
   document.querySelector(".stage").classList.toggle("centered", !!st.center);
   if (G){ G.centered = !!st.center; G.zoomTarget = st.zoom || 1; G.shift = st.shift || 0.17; }
